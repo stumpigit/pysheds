@@ -921,6 +921,8 @@ class sGrid():
             eff = np.asarray(eff)
         # Find indegree of all cells
         indegree = np.bincount(endnodes.ravel(), minlength=fdir.size).astype(np.uint8)
+        # Ensure indegree has exactly fdir.size elements (in case endnodes contains values >= fdir.size)
+        indegree = indegree[:fdir.size]
         # Set starting nodes to those with no predecessors
         startnodes = startnodes[(indegree == 0)]
         # Compute accumulation for no efficiency case
@@ -1430,6 +1432,8 @@ class sGrid():
         startnodes = np.arange(fdir.size, dtype=np.int64)
         endnodes = _self._flatten_fdir_numba(masked_fdir, dirmap).reshape(fdir.shape)
         indegree = np.bincount(endnodes.ravel(), minlength=fdir.size).astype(np.uint8)
+        # Ensure indegree has exactly fdir.size elements (in case endnodes contains values >= fdir.size)
+        indegree = indegree[:fdir.size]
         orig_indegree = np.copy(indegree)
         startnodes = startnodes[(indegree == 0)]
         if algorithm.lower() == 'iterative':
@@ -1513,6 +1517,8 @@ class sGrid():
         startnodes = np.arange(fdir.size, dtype=np.int64)
         endnodes = _self._flatten_fdir_numba(masked_fdir, dirmap).reshape(fdir.shape)
         indegree = np.bincount(endnodes.ravel(), minlength=fdir.size).astype(np.uint8)
+        # Ensure indegree has exactly fdir.size elements (in case endnodes contains values >= fdir.size)
+        indegree = indegree[:fdir.size]
         orig_indegree = np.copy(indegree)
         startnodes = startnodes[(indegree == 0)]
         profiles, connections = _self._d8_stream_connection_iter_numba(endnodes, indegree,
@@ -1576,7 +1582,8 @@ class sGrid():
         masked_fdir = np.where(mask, fdir, 0).astype(np.int64)
         startnodes = np.arange(fdir.size, dtype=np.int64)
         endnodes = _self._flatten_fdir_numba(masked_fdir, dirmap).reshape(fdir.shape)
-        indegree = np.bincount(endnodes.ravel()).astype(np.uint8)
+        #indegree = np.bincount(endnodes.ravel()).astype(np.uint8)
+        indegree = np.bincount(endnodes.ravel(), minlength=fdir.size).astype(np.uint8)
         orig_indegree = np.copy(indegree)
         startnodes = startnodes[(indegree == 0)]
         min_order = np.full(fdir.shape, np.iinfo(np.int64).max, dtype=np.int64)
@@ -1672,7 +1679,9 @@ class sGrid():
             weights = (~nodata_cells).reshape(fdir.shape).astype(np.float64)
         startnodes = np.arange(fdir.size, dtype=np.int64)
         endnodes = _self._flatten_fdir_numba(fdir, dirmap).reshape(fdir.shape)
-        indegree = np.bincount(endnodes.ravel()).astype(np.uint8)
+        indegree = np.bincount(endnodes.ravel(), minlength=fdir.size).astype(np.uint8)
+        # Ensure indegree has exactly fdir.size elements (in case endnodes contains values >= fdir.size)
+        indegree = indegree[:fdir.size]
         startnodes = startnodes[(indegree == 0)]
         rdist = np.zeros(fdir.shape, dtype=np.float64)
         if algorithm.lower() == 'iterative':
