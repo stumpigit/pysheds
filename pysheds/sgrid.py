@@ -920,7 +920,9 @@ class sGrid():
             eff = efficiency.astype(np.float64).reshape(fdir.shape)
             eff = np.asarray(eff)
         # Find indegree of all cells
-        indegree = np.bincount(endnodes.ravel(), minlength=fdir.size).astype(np.uint8)
+        # Clip endnodes to non-negative values (bincount doesn't accept negative values)
+        endnodes_flat = np.clip(endnodes.ravel(), 0, None)
+        indegree = np.bincount(endnodes_flat, minlength=fdir.size).astype(np.uint8)
         # Ensure indegree has exactly fdir.size elements (in case endnodes contains values >= fdir.size)
         indegree = indegree[:fdir.size]
         # Set starting nodes to those with no predecessors
@@ -971,8 +973,9 @@ class sGrid():
             eff = efficiency.reshape(fdir.shape).astype(np.float64)
             eff = np.asarray(eff)
         # Find indegree of all cells
-        indegree_0 = np.bincount(endnodes_0.ravel(), minlength=fdir.size)
-        indegree_1 = np.bincount(endnodes_1.ravel(), minlength=fdir.size)
+        # Clip endnodes to non-negative values (bincount doesn't accept negative values)
+        indegree_0 = np.bincount(np.clip(endnodes_0.ravel(), 0, None), minlength=fdir.size)
+        indegree_1 = np.bincount(np.clip(endnodes_1.ravel(), 0, None), minlength=fdir.size)
         indegree = (indegree_0 + indegree_1).astype(np.uint8)
         # Set starting nodes to those with no predecessors
         startnodes = startnodes[(indegree == 0)]
@@ -1431,7 +1434,8 @@ class sGrid():
         masked_fdir = np.where(mask, fdir, 0).astype(np.int64)
         startnodes = np.arange(fdir.size, dtype=np.int64)
         endnodes = _self._flatten_fdir_numba(masked_fdir, dirmap).reshape(fdir.shape)
-        indegree = np.bincount(endnodes.ravel(), minlength=fdir.size).astype(np.uint8)
+        # Clip endnodes to non-negative values (bincount doesn't accept negative values)
+        indegree = np.bincount(np.clip(endnodes.ravel(), 0, None), minlength=fdir.size).astype(np.uint8)
         # Ensure indegree has exactly fdir.size elements (in case endnodes contains values >= fdir.size)
         indegree = indegree[:fdir.size]
         orig_indegree = np.copy(indegree)
@@ -1516,7 +1520,8 @@ class sGrid():
         masked_fdir = np.where(mask, fdir, 0).astype(np.int64)
         startnodes = np.arange(fdir.size, dtype=np.int64)
         endnodes = _self._flatten_fdir_numba(masked_fdir, dirmap).reshape(fdir.shape)
-        indegree = np.bincount(endnodes.ravel(), minlength=fdir.size).astype(np.uint8)
+        # Clip endnodes to non-negative values (bincount doesn't accept negative values)
+        indegree = np.bincount(np.clip(endnodes.ravel(), 0, None), minlength=fdir.size).astype(np.uint8)
         # Ensure indegree has exactly fdir.size elements (in case endnodes contains values >= fdir.size)
         indegree = indegree[:fdir.size]
         orig_indegree = np.copy(indegree)
@@ -1583,7 +1588,10 @@ class sGrid():
         startnodes = np.arange(fdir.size, dtype=np.int64)
         endnodes = _self._flatten_fdir_numba(masked_fdir, dirmap).reshape(fdir.shape)
         #indegree = np.bincount(endnodes.ravel()).astype(np.uint8)
-        indegree = np.bincount(endnodes.ravel(), minlength=fdir.size).astype(np.uint8)
+        # Clip endnodes to non-negative values (bincount doesn't accept negative values)
+        indegree = np.bincount(np.clip(endnodes.ravel(), 0, None), minlength=fdir.size).astype(np.uint8)
+        # Ensure indegree has exactly fdir.size elements (in case endnodes contains values >= fdir.size)
+        indegree = indegree[:fdir.size]
         orig_indegree = np.copy(indegree)
         startnodes = startnodes[(indegree == 0)]
         min_order = np.full(fdir.shape, np.iinfo(np.int64).max, dtype=np.int64)
@@ -1679,7 +1687,8 @@ class sGrid():
             weights = (~nodata_cells).reshape(fdir.shape).astype(np.float64)
         startnodes = np.arange(fdir.size, dtype=np.int64)
         endnodes = _self._flatten_fdir_numba(fdir, dirmap).reshape(fdir.shape)
-        indegree = np.bincount(endnodes.ravel(), minlength=fdir.size).astype(np.uint8)
+        # Clip endnodes to non-negative values (bincount doesn't accept negative values)
+        indegree = np.bincount(np.clip(endnodes.ravel(), 0, None), minlength=fdir.size).astype(np.uint8)
         # Ensure indegree has exactly fdir.size elements (in case endnodes contains values >= fdir.size)
         indegree = indegree[:fdir.size]
         startnodes = startnodes[(indegree == 0)]
@@ -1712,8 +1721,9 @@ class sGrid():
         # Remove cycles
         _self._dinf_fix_cycles_numba(endnodes_0, endnodes_1, cycle_size)
         # Find indegree of all cells
-        indegree_0 = np.bincount(endnodes_0.ravel(), minlength=fdir.size)
-        indegree_1 = np.bincount(endnodes_1.ravel(), minlength=fdir.size)
+        # Clip endnodes to non-negative values (bincount doesn't accept negative values)
+        indegree_0 = np.bincount(np.clip(endnodes_0.ravel(), 0, None), minlength=fdir.size)
+        indegree_1 = np.bincount(np.clip(endnodes_1.ravel(), 0, None), minlength=fdir.size)
         indegree = (indegree_0 + indegree_1).astype(np.uint8)
         # Set starting nodes to those with no predecessors
         startnodes = startnodes[(indegree == 0)]
